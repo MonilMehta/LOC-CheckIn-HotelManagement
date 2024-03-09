@@ -1,10 +1,12 @@
 import { styled } from "styled-components";
 import { mobile } from "./Responsive";
+import { Facebook, Twitter, Instagram, LocationOn, Phone, MailOutline } from '@mui/icons-material';
 
 const Container = styled.div`
   display: flex;
-  background-color: white; /* Inverted background color */
-  color: black; /* Inverted text color */
+  background-color: #212121; /* Dark background color */
+  color: white; /* Text color */
+  padding: 30px;
   ${mobile({ flexDirection: "column" })}
 `;
 
@@ -12,7 +14,6 @@ const Left = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 20px;
   justify-content: center;
   align-items: center;
 `;
@@ -23,12 +24,14 @@ const Logo = styled.img`
 `;
 
 const Description = styled.p`
-  margin: 20px 5px;
-  color: black; /* Inverted text color */
+  margin: 20px 0;
+  max-width: 200px;
+  text-align: center;
 `;
 
 const SocialContainer = styled.div`
   display: flex;
+  margin-top: 20px;
 `;
 
 const SocialIcon = styled.div`
@@ -40,7 +43,7 @@ const SocialIcon = styled.div`
   justify-content: center;
   margin: 0px 5px;
   background-color: white; /* Inverted background color */
-  color: black; /* Inverted text color */
+  color: #212121; /* Inverted text color */
   transition: all 0.5s ease;
 
   &:hover {
@@ -55,23 +58,17 @@ const Center = styled.div`
 `;
 
 const Title = styled.h3`
-  margin-bottom: 30px;
-  color: black; /* Inverted text color */
+  margin-bottom: 20px;
 `;
 
 const List = styled.ul`
   margin: 0;
   padding: 0;
   list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  color: black; /* Inverted text color */
 `;
 
 const ListItem = styled.li`
-  width: 50%;
   margin-bottom: 10px;
-  color: black; /* Inverted text color */
 `;
 
 const Right = styled.div`
@@ -80,14 +77,12 @@ const Right = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  color: black; /* Inverted text color */
 `;
 
 const ContactItem = styled.div`
   margin-bottom: 20px;
   display: flex;
   align-content: center;
-  color: black; /* Inverted text color */
 `;
 
 const Payment = styled.div``;
@@ -98,46 +93,43 @@ const Footer = () => {
       <Left>
         {/* <Logo src="bird.png"></Logo> */}
         <Description>
-          Simplify hotel management with our comprehensive system. Track room
-          cleanliness, monitor inventory, and generate ideal room images. Manage
-          your hotel efficiently with our powerful features.
+          Stay connected with us on social media for the latest updates and
+          promotions.
         </Description>
         <SocialContainer>
           <SocialIcon>
-            <i className="fa-brands fa-github"></i>
+            <Facebook />
           </SocialIcon>
           <SocialIcon>
-            <i className="fa-brands fa-linkedin"></i>
+            <Twitter />
           </SocialIcon>
           <SocialIcon>
-            <i className="fa-brands fa-discord"></i>
+            <Instagram />
           </SocialIcon>
         </SocialContainer>
       </Left>
       <Center>
-        <Title>Pages links</Title>
+        <Title>Quick Links</Title>
         <List>
-          <ListItem>A</ListItem>
-          <ListItem>B</ListItem>
-          <ListItem>C</ListItem>
-          <ListItem>D</ListItem>
-          <ListItem>E</ListItem>
-          <ListItem>F</ListItem>
-          <ListItem>G</ListItem>
-          <ListItem>H</ListItem>
+          <ListItem>Privacy Policy</ListItem>
+          <ListItem>Terms of Service</ListItem>
+          <ListItem>FAQs</ListItem>
+          <ListItem>Contact Us</ListItem>
         </List>
       </Center>
       <Right>
-        <Title>CONTACT</Title>
+        <Title>Contact</Title>
         <ContactItem>
-          <i className="fa-solid fa-location-dot me-2"></i> Vile Parle, Mumbai,
-          Maharashtra
+          <LocationOn style={{ marginRight: '8px' }} />
+          Vile Parle, Mumbai, Maharashtra
         </ContactItem>
         <ContactItem>
-          <i className="fa-solid fa-phone me-2"></i> +91 99999 99999
+          <Phone style={{ marginRight: '8px' }} />
+          +91 99999 99999
         </ContactItem>
         <ContactItem>
-          <i className="fa-regular fa-envelope me-2"></i> xyz@gmail.com
+          <MailOutline style={{ marginRight: '8px' }} />
+          info@example.com
         </ContactItem>
         <Payment />
       </Right>

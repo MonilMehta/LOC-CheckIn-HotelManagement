@@ -1,6 +1,6 @@
 import React from 'react';
 import ResponsiveAppBar from './Navbar';
-import { Typography, Button, Fade, Container, Grid, Paper } from '@mui/material';
+import { Typography, Fade, Container, Grid, Paper } from '@mui/material';
 import RoomCleanlinessIcon from '@mui/icons-material/CleanHands';
 import InventoryIcon from '@mui/icons-material/ListAlt';
 import RoomImageIcon from '@mui/icons-material/Photo';
@@ -9,7 +9,7 @@ import SchedulingIcon from '@mui/icons-material/Event';
 import DamageDetectionIcon from '@mui/icons-material/Report';
 import HomeCarou from './HomeCarou';
 import HotelReview from './HotelReview';
-
+import Footer from './Footer';
 const FeatureCard = ({ icon, title, description }) => (
   <Grid item xs={12} sm={6} md={4}>
     <Paper
@@ -20,6 +20,25 @@ const FeatureCard = ({ icon, title, description }) => (
       }}
     >
       {React.cloneElement(icon, { style: { fontSize: '3rem', color: '#1976D2' } })}
+      <Typography variant="h6" style={{ marginTop: '10px', marginBottom: '15px' }}>
+        {title}
+      </Typography>
+      <Typography variant="body1" color="textSecondary">
+        {description}
+      </Typography>
+    </Paper>
+  </Grid>
+);
+
+const ChallengeCard = ({ title, description }) => (
+  <Grid item xs={12} md={4} style={{ marginBottom: '20px' }}>
+    <Paper
+      style={{
+        textAlign: 'center',
+        padding: '20px',
+        borderRadius: '15px',
+      }}
+    >
       <Typography variant="h6" style={{ marginTop: '10px', marginBottom: '15px' }}>
         {title}
       </Typography>
@@ -68,30 +87,20 @@ const Home = () => {
               Challenges Faced:
             </Typography>
           </Fade>
-          <Fade in={loaded} timeout={4000}>
-            <Typography variant="body1" paragraph>
-              - Difficulty in analyzing room cleanliness and identifying issues.
-            </Typography>
-          </Fade>
-          <Fade in={loaded} timeout={5000}>
-            <Typography variant="body1" paragraph>
-              - Challenges in keeping track of damaged products and estimating
-              replacement costs.
-            </Typography>
-          </Fade>
-          <Fade in={loaded} timeout={6000}>
-            <Typography variant="body1" paragraph>
-              - Managing and monitoring staff activities efficiently.
-            </Typography>
-          </Fade>
-          <Fade in={loaded} timeout={7000}>
-            <Typography variant="body1" paragraph>
-              Our system provides a comprehensive solution to these challenges,
-              making hotel management more efficient and streamlined.
-            </Typography>
-          </Fade>
+          <ChallengeCard
+            title="Difficulty in analyzing room cleanliness and identifying issues."
+            description="Utilize image analysis to assess room cleanliness, checking for bedsheet wrinkles, floor, etc."
+          />
+          <ChallengeCard
+            title="Challenges in keeping track of damaged products and estimating replacement costs."
+            description="Monitor the inventory of amenities provided in the rooms, such as towels, toiletries, and minibar items."
+          />
+          <ChallengeCard
+            title="Managing and monitoring staff activities efficiently."
+            description="Use Generative AI to generate ideal room images and compare them with uploaded photos to find differences."
+          />
         </div>
-        <Fade in={loaded} timeout={3000}>
+        <Fade in={loaded} timeout={4000}>
           <Typography variant="h4" gutterBottom style={{ marginTop: '50px', textAlign: 'center' }}>
             Main Features
           </Typography>
@@ -135,6 +144,7 @@ const Home = () => {
           <HotelReview />
         </Container>
       </Container>
+      <Footer/>
     </div>
   );
 };

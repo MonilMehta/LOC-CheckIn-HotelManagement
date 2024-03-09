@@ -1,13 +1,9 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Typography, Button, Container, Box } from '@mui/material';
-import ResponsiveAppBarStaff from './StaffNavbar';
 import Modal from 'react-modal';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import SendIcon from '@mui/icons-material/Send';
-import Footer from './Footer';
-import StaffInvent from './StaffInvent';
-import StaffDamageR from './StaffDamageR';
 
 const StaffDashboard = () => {
   const location = useLocation();
@@ -56,7 +52,6 @@ const StaffDashboard = () => {
 
   return (
     <div>
-      <ResponsiveAppBarStaff />
       <Container component="main" maxWidth="xs">
         <Box
           sx={{
@@ -67,13 +62,7 @@ const StaffDashboard = () => {
           }}
         >
           <Typography variant="h3" color="textPrimary" gutterBottom>
-            Staff Dashboard
-          </Typography>
-          <Typography variant="body1" color="textSecondary">
-            Floor Number: {floorNumber}
-          </Typography>
-          <Typography variant="body1" color="textSecondary">
-            Room Number: {roomNumber}
+            Damage images
           </Typography>
           <Button
             component="label"
@@ -194,9 +183,6 @@ const StaffDashboard = () => {
           </Modal>
         </Box>
       </Container>
-      <StaffInvent/>
-      <StaffDamageR/>
-      <Footer/>
     </div>
   );
 };

@@ -1,45 +1,93 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ResponsiveAppBarAdmin from './AdminNavbar';
-import { Typography, Card, CardContent, Grid, TextField } from '@mui/material';
-
-const Home = () => {
-  // Mocked data for demonstration
+import { Typography, Card, CardContent, Grid, TextField, Button } from '@mui/material';
+import Footer from './Footer';
+const StaffMain = () => {
+  const navigate = useNavigate();
+  const [numberOfFloors, setNumberOfFloors] = useState(3);
+  const [numberOfRooms, setNumberOfRooms] = useState(9);
   const [roomInspections, setRoomInspections] = useState([]);
-  const [numFloors, setNumFloors] = useState(3); // Default value is 1 floor
-  const [numRoomsPerFloor, setNumRoomsPerFloor] = useState(9); // Default value is 10 rooms per floor
+  const [visitedRooms, setVisitedRooms] = useState(new Set());
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
-    // Fetch progress reports or inspections for the admin
-    // For simplicity, I'll use a dummy data structure. Replace this with API calls.
-    const totalRooms = numFloors * numRoomsPerFloor;
+    const totalRooms = numberOfFloors * numberOfRooms;
 
     const inspections = Array.from({ length: totalRooms }, (_, index) => ({
       roomNumber: String(index + 1),
-      cleanliness: index % 2 === 0 ? 'Clean' : 'Needs Improvement',
+      cleanliness: 'Needs Improvement',
       inventory: index % 3 === 0 ? 'Stocked' : 'Low Stock',
     }));
 
     setRoomInspections(inspections);
-  }, [numFloors, numRoomsPerFloor]);
+  }, [numberOfFloors, numberOfRooms]);
 
-  const organizeRoomsByFloors = () => {
-    const roomsByFloor = Array.from({ length: numFloors }, (_, floorIndex) => {
-      const floorRooms = roomInspections.slice(
-        floorIndex * numRoomsPerFloor,
-        (floorIndex + 1) * numRoomsPerFloor
-      );
-      return {
-        floor: floorIndex + 1,
-        rooms: floorRooms,
-      };
-    });
+  const organizeRooms = (cleanlinessStatus) => {
+    const organizedRooms = {};
+    roomInspections
+      .filter((inspection) => inspection.cleanliness === cleanlinessStatus)
+      .forEach((inspection) => {
+        const floorNumber = Math.ceil(inspection.roomNumber / numberOfRooms);
+        if (!organizedRooms[floorNumber]) {
+          organizedRooms[floorNumber] = [];
+        }
+        organizedRooms[floorNumber].push(inspection);
+      });
 
-    return roomsByFloor;
+    return Object.entries(organizedRooms).map(([floor, rooms], floorIndex) => (
+      <div key={floorIndex}>
+        <Typography variant="h5" color="textPrimary" gutterBottom>
+          Floor {floor}
+        </Typography>
+        <Grid container spacing={2}>
+          {rooms.map((inspection, index) => (
+            <Grid item key={index} xs={12} sm={6} md={4}>
+              <Card
+                style={{
+                  cursor: 'pointer',
+                  backgroundColor: visitedRooms.has(inspection.roomNumber)
+                    ? '#c8e6c9'
+                    : 'white',
+                }}
+                onClick={() => handleRoomClick(inspection.roomNumber)}
+              >
+                <CardContent>
+                  <Typography variant="h6" color="textPrimary" gutterBottom>
+                    Room {inspection.roomNumber}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Cleanliness: {inspection.cleanliness}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Inventory: {inspection.inventory}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </div>
+    ));
+  };
+
+  const handleRoomClick = (roomNumber) => {
+    const floorNumber = Math.ceil(roomNumber / numberOfRooms);
+    navigate(`/AdminReport`, { state: { floorNumber, roomNumber } });
+    setVisitedRooms((prevVisitedRooms) => new Set(prevVisitedRooms).add(roomNumber));
+  };
+
+  const handleEdit = () => {
+    setEditMode(!editMode);
+  };
+
+  const handleSave = () => {
+    setEditMode(false);
   };
 
   return (
     <div>
-      <ResponsiveAppBarAdmin/>
+      <ResponsiveAppBarAdmin />
       <div
         style={{
           textAlign: 'center',
@@ -54,47 +102,39 @@ const Home = () => {
             label="Number of Floors"
             type="number"
             variant="outlined"
-            value={numFloors}
-            onChange={(e) => setNumFloors(Number(e.target.value))}
+            value={numberOfFloors}
+            onChange={(e) => setNumberOfFloors(Number(e.target.value))}
             style={{ marginRight: '20px' }}
+            disabled={!editMode}
           />
           <TextField
             label="Number of Rooms per Floor"
             type="number"
             variant="outlined"
-            value={numRoomsPerFloor}
-            onChange={(e) => setNumRoomsPerFloor(Number(e.target.value))}
+            value={numberOfRooms}
+            onChange={(e) => setNumberOfRooms(Number(e.target.value))}
+            disabled={!editMode}
           />
+          {editMode ? (
+            <Button variant="contained" color="primary" onClick={handleSave}>
+              Save
+            </Button>
+          ) : (
+            <Button variant="contained" color="secondary" onClick={handleEdit}>
+              Edit
+            </Button>
+          )}
         </div>
-        {organizeRoomsByFloors().map((floorData) => (
-          <div key={floorData.floor} style={{ marginBottom: '20px' }}>
-            <Typography variant="h5" color="textPrimary" gutterBottom>
-              Floor {floorData.floor}
-            </Typography>
-            <Grid container spacing={2}>
-              {floorData.rooms.map((inspection, index) => (
-                <Grid item key={index} xs={12} sm={6} md={4}>
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h6" color="textPrimary" gutterBottom>
-                        Room {inspection.roomNumber}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary">
-                        Cleanliness: {inspection.cleanliness}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary">
-                        Inventory: {inspection.inventory}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </div>
-        ))}
+        <div>
+          <Typography variant="h5" color="textPrimary" gutterBottom>
+            Pending Rooms
+          </Typography>
+          {organizeRooms('Needs Improvement')}
+        </div>
       </div>
+      <Footer/>
     </div>
   );
 };
 
-export default Home;
+export default StaffMain;
