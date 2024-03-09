@@ -10,4 +10,4 @@ class RoomStatusSerializer(serializers.ModelSerializer):
 class RoomStatusCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = RoomStatus
-        fields = ['room_number', 'status', 'employee', 'progress_description', 'inventory_update', 'room_image']
+        fields = ['room_number', 'status', 'employee', 'progress_description', 'toiletries', 'towels', 'minibar_items', 'room_image']
