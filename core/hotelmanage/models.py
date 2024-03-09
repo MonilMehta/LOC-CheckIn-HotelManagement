@@ -9,7 +9,7 @@ class RoomStatus(models.Model):
 
     room_number = models.CharField(max_length=50)
     is_cleaned = models.BooleanField(default=False)  # Field to track if the room is cleaned
-    status = models.CharField(max_length=20, choices=ROOM_STATUSES)
+    status = models.CharField(max_length=20, choices=ROOM_STATUSES, blank=True, null=True)
     last_checked = models.DateTimeField(auto_now=True)
     employee = models.ForeignKey(User, on_delete=models.CASCADE)
     progress_description = models.TextField(blank=True, null=True)
