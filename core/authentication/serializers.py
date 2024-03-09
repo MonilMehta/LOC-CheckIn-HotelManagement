@@ -1,14 +1,6 @@
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import User 
+# serializers.py
 from rest_framework import serializers
-
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super(MyTokenObtainPairSerializer, cls).get_token(user)
-        token['username'] = user.username
-        return token
-    
+from .models import User
 
 class SignupSerializer(serializers.ModelSerializer):
     employee_type = serializers.ChoiceField(choices=User.TYPE_CHOICES)

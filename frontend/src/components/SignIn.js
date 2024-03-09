@@ -33,10 +33,12 @@ function SignIn() {
 
     try {
       const response = await axios.post(
-        'http://127.0.0.1:8000/api/signin/',
+        'http://127.0.0.1:8000/auth/signin/',
+        data,
         {
-          username: username,
-          password: password,
+          headers: {
+            'Content-Type': 'multipart/form-data', // Set content type for FormData
+          },
         }
       );
 

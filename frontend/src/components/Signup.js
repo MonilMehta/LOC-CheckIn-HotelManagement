@@ -50,7 +50,7 @@ function SignUp() {
     try {
       // Make the Axios request
       const response = await axios.post(
-        'http://127.0.0.1:8000/api/signup/',
+        'http://127.0.0.1:8000/auth/signup/',
         data
       );
   

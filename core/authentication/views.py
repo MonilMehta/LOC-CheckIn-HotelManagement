@@ -1,17 +1,10 @@
-from django.shortcuts import render
-
-# Create your views here.
 # views.py
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
-from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import SignupSerializer, MyTokenObtainPairSerializer  # Import your serializers here
-from rest_framework_simplejwt.views import TokenRefreshView
-
-class MyTokenRefreshView(TokenRefreshView):
-    pass
+from knox.models import AuthToken  # Import AuthToken from Knox
+from .serializers import SignupSerializer
 
 @api_view(['POST'])
 def signup(request):
@@ -21,7 +14,7 @@ def signup(request):
             user = serializer.save()
             return Response({'message': 'User created successfully','username':user.username}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 @api_view(['POST'])
 def signin(request):
     if request.method == 'POST':
@@ -29,11 +22,9 @@ def signin(request):
         password = request.data.get('password')
         user = authenticate(username=username, password=password)
         if user:
-            token_serializer = MyTokenObtainPairSerializer()
-            token = token_serializer.get_token(user)
-            refresh = RefreshToken.for_user(user)
+            # Generate token using Knox's AuthToken
+            _, token = AuthToken.objects.create(user)
             return Response({
-                'access_token': str(token),
-                'refresh_token': str(refresh)
+                'token': token
             }, status=status.HTTP_200_OK)
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)

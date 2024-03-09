@@ -38,13 +38,22 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'rest_framework',
-    'rest_framework_simplejwt',
+    'rest_framework.authtoken',
+    'knox',
     "authentication",
     'corsheaders',
+    "hotelmanage",
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'knox.auth.TokenAuthentication',
+    ],
+}
 
 AUTH_USER_MODEL = 'authentication.User'
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -53,7 +62,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
      'django.middleware.common.CommonMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    
 ]
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',  # or your frontend URL
