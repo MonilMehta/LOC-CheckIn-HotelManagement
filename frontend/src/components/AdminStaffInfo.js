@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ResponsiveAppBarAdmin from './AdminNavbar';
-
+import Footer from './Footer';
 const AdminStaffInfo = () => {
   const staffData = [
     { name: 'John Doe', room: 'Room 101', floor: 1 },
@@ -47,6 +47,7 @@ const AdminStaffInfo = () => {
           </div>
         ))}
       </div>
+      <Footer/>
     </div>
   );
 };

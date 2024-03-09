@@ -7,8 +7,8 @@ import AdminDashboard from './components/AdminDashboard';
 import StaffDashboard from './components/StaffDashboard';
 import StaffMain from './components/StaffMain';
 import { BrowserRouter,Route,Routes} from 'react-router-dom';
-import Footer from './components/Footer';
 import AdminStaffInfo from './components/AdminStaffInfo';
+import AdminReport from './components/AdminReport';
 function App() {
   return (
     <div className="App">
@@ -22,8 +22,10 @@ function App() {
         <Route path='/SignIn' element={<SignIn/>}/>
         <Route path='/Signup' element={<SignUp/>}/>
         <Route path='/AdminStaffInfo' element={<AdminStaffInfo/>}/>
+        <Route path='/AdminReport' element={<AdminReport/>}/>
+        
       </Routes>
-      <Footer/>
+      
       </BrowserRouter>
     </div>
   );
