@@ -12,7 +12,7 @@ class RoomStatus(models.Model):
     is_cleaned = models.BooleanField(default=False)
     status = models.CharField(max_length=20, choices=ROOM_STATUSES, default='clean')
     last_checked = models.DateTimeField(auto_now=True)
-    employee = models.ForeignKey(User, on_delete=models.CASCADE, default=None)  # Default value set to None
+    employee = models.ForeignKey(User, on_delete=models.CASCADE, default=1)  # Default value set to None
     progress_description = models.TextField(blank=True, null=True)
     room_image = models.ImageField(upload_to='room_images/', blank=True, null=True)
     flagged_for_maintenance = models.BooleanField(default=False)
@@ -27,6 +27,8 @@ class RoomStatus(models.Model):
         return f"Room {self.room_number} - {self.status}"
 
     def save(self, *args, **kwargs):
+        if self.employee_id is None and hasattr(self, 'request') and hasattr(self.request, 'user'):
+            self.employee = self.request.user
         # Update the flagged_for_maintenance field based on the room status
         if self.status == 'maintenance':
             self.flagged_for_maintenance = True

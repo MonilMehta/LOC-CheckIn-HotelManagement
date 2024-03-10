@@ -16,7 +16,7 @@ const StaffMain = () => {
     try {
       const response = await axios.get('http://localhost:8000/api/room-status/', {
         headers: {
-          Authorization: 'Token 871bc7111880cf538430602ec01d00425896fcc01f624d6451d476422baad4b8',
+          Authorization: 'Token 7456615913faabc16cec2f41ca04ea342a11b6035d139be6133a986933ebdccb',
         },
       });
       setRoomInspections(response.data);
@@ -30,8 +30,7 @@ const StaffMain = () => {
   }, []);
 
   const handleRoomClick = (roomNumber) => {
-    const floorNumber = Math.ceil(roomNumber / numberOfRooms);
-    navigate(`/StaffDashboard`, { state: { floorNumber, roomNumber } });
+    navigate(`/StaffDashboard`, { state: {  roomNumber } });
     setVisitedRooms((prevVisitedRooms) => new Set(prevVisitedRooms).add(roomNumber));
   };
 
