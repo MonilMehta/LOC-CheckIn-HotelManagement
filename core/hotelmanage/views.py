@@ -145,6 +145,7 @@ def detect_objects_and_count(img):
 @api_view(['POST'])
 @csrf_exempt
 def inventory_check(request):
+    employee = request.user
     if request.method == 'POST' and request.FILES.get('image'):
         # Get the uploaded image file
         image_file = request.FILES['image']
@@ -160,6 +161,7 @@ def inventory_check(request):
         room_status = RoomStatus.objects.create(
             room_number=request.data.get('room_number'),
             status=request.data.get('status'),
+            employee=employee,  # Set the employee field
             # Add other fields as necessary
             bottle=object_counts.get('bottle', 0),
             cup=object_counts.get('cup', 0),
