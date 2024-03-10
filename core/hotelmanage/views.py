@@ -1,7 +1,8 @@
 import pandas as pd
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 
 from .models import RoomStatus
 from .serializers import RoomStatusCreateSerializer, RoomStatusSerializer
@@ -16,6 +17,7 @@ from django.core.files.base import ContentFile
 from ultralytics import YOLO
 from collections import Counter
 import numpy as np
+from .functions import generate_image, get_similarity_score, predict_step
 
 room_model = load_model('room.h5')
 model = YOLO("yolov8s.pt")
@@ -146,35 +148,63 @@ def detect_objects_and_count(img):
 @api_view(['POST'])
 @csrf_exempt
 def inventory_check(request):
-    employee = request.user
-    if request.method == 'POST' and request.FILES.get('image'):
-        # Get the uploaded image file
-        image_file = request.FILES['image']
-        
-        # Perform object detection on the uploaded image
-        image = cv2.imdecode(np.fromstring(image_file.read(), np.uint8), cv2.IMREAD_COLOR)
-        image = cv2.resize(image, (1020, 500))
-        
-        # Detect objects and count them
-        object_counts = detect_objects_and_count(image)
-        
-        # Update RoomStatus object with the counts
-        room_status = RoomStatus.objects.create(
-            room_number=request.data.get('room_number'),
-            status=request.data.get('status'),
-            employee=employee,  # Set the employee field
-            # Add other fields as necessary
-            bottle=object_counts.get('bottle', 0),
-            cup=object_counts.get('cup', 0),
-            wine_glass=object_counts.get('wine_glass', 0),
-            bowl=object_counts.get('bowl', 0)
-        )
-        
-        # Construct the response JSON data
-        response_data = {
-            "inventory_counts": object_counts
-        }
-        
-        return Response(response_data, status=status.HTTP_201_CREATED)
+    permission_classes = [AllowAny]
+    if not request.user.is_anonymous:
+        employee = request.user
+        if request.method == 'POST' and request.FILES.get('image'):
+   
+            image_file = request.FILES['image']
+            
+            # Perform object detection on the uploaded image
+            image = cv2.imdecode(np.fromstring(image_file.read(), np.uint8), cv2.IMREAD_COLOR)
+            image = cv2.resize(image, (1020, 500))
+            
+            # Detect objects and count them
+            object_counts = detect_objects_and_count(image)
+            
+            # Update RoomStatus object with the counts
+            room_status = RoomStatus.objects.create(
+                room_number=request.data.get('room_number'),
+                status=request.data.get('status'),
+                employee=employee,  # Set the employee field
+                # Add other fields as necessary
+                bottle=object_counts.get('bottle', 0),
+                cup=object_counts.get('cup', 0),
+                wine_glass=object_counts.get('wine_glass', 0),
+                bowl=object_counts.get('bowl', 0)
+            )
+            
+            # Construct the response JSON data
+            response_data = {
+                "inventory_counts": object_counts
+            }
+            
+            return Response(response_data, status=status.HTTP_201_CREATED)
     else:
-        return Response({"error": "Please provide an image file via POST request."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Authentication failed"}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+@csrf_exempt
+def process_images(request):
+    if request.method == 'POST':
+        # Process the request data
+        prompt = request.POST.get('prompt')
+        image_paths = request.FILES.getlist('images[]')
+        
+        # Generate and save the image
+        generate_image(prompt, image_gen_model, save_path)
+
+        # Calculate similarity score
+        similarity_score = get_similarity_score(img1, img2)
+
+        # Perform image captioning
+        captions = predict_step(image_paths)
+
+        # Return the results as JSON response
+        return JsonResponse({
+            'similarity_score': similarity_score,
+            'captions': captions
+        })
+
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)

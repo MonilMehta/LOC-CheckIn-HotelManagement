@@ -77,7 +77,6 @@ const StaffDashboard = () => {
           const inventoryFormData = new FormData();
           inventoryFormData.append('room_number', roomNumber);
           inventoryFormData.append('image', file);
-          inventoryFormData.append('Authentication', 'Token 7456615913faabc16cec2f41ca04ea342a11b6035d139be6133a986933ebdccb');
           return fetch(inventoryEndpoint, {
             method: 'POST',
             body: inventoryFormData,
