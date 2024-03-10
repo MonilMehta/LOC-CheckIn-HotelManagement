@@ -16,7 +16,7 @@ const StaffMain = () => {
     try {
       const response = await axios.get('http://localhost:8000/api/room-status/', {
         headers: {
-          Authorization: 'Token 77c80579fe6b77cb0cab3837e238c0ad94bf2afcbdec8ac4ef6f6e59ef76d55d',
+          Authorization: 'Token 871bc7111880cf538430602ec01d00425896fcc01f624d6451d476422baad4b8',
         },
       });
       setRoomInspections(response.data);

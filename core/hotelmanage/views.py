@@ -117,6 +117,7 @@ def createroom(request):
             room_status.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 def detect_objects_and_count(img):
     results = model.predict(img)
     a = results[0].boxes.data

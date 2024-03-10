@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Typography, Button, Container, Box } from '@mui/material';
-import ResponsiveAppBarStaff from './StaffNavbar';
 import Modal from 'react-modal';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import SendIcon from '@mui/icons-material/Send';
-import Footer from './Footer';
+import axios from 'axios'; // Import Axios for API requests
+import ResponsiveAppBarStaff from './ResponsiveAppBarStaff';
 import StaffInvent from './StaffInvent';
 import StaffDamageR from './StaffDamageR';
+import Footer from './Footer';
 
 const StaffDashboard = () => {
   const location = useLocation();
@@ -18,37 +19,43 @@ const StaffDashboard = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
   const [submittedData, setSubmittedData] = useState([]);
 
+  // Function to handle file change
   const handleFileChange = (event) => {
     const uploadedFiles = Array.from(event.target.files);
     setFiles([...files, ...uploadedFiles]);
   };
 
+  // Function to handle image removal
   const handleRemoveImage = (index) => {
     const updatedFiles = [...files];
     updatedFiles.splice(index, 1);
     setFiles(updatedFiles);
   };
 
-  const handleSubmit = () => {
-    const submissionTime = new Date().toLocaleString();
-    const submissionData = {
-      time: submissionTime,
-      floorNumber,
-      roomNumber,
-      images: files.map((file) => URL.createObjectURL(file)),
-    };
+  // Function to handle form submission
+  const handleSubmit = async () => {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('image', file);
+    });
 
-    setSubmittedData([submissionData, ...submittedData]);
-
-    // Reset form after submission
-    setFiles([]);
+    try {
+      const response = await axios.post('/api/createroom', formData);
+      console.log(response.data);
+      setSubmittedData([response.data, ...submittedData]);
+      setFiles([]);
+    } catch (error) {
+      console.error('Error submitting data:', error);
+    }
   };
 
+  // Function to open modal
   const openModal = (index) => {
     setSelectedImageIndex(index);
     setIsModalOpen(true);
   };
 
+  // Function to close modal
   const closeModal = () => {
     setSelectedImageIndex(null);
     setIsModalOpen(false);
