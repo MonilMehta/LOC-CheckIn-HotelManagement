@@ -9,6 +9,7 @@ import StaffMain from './components/StaffMain';
 import { BrowserRouter,Route,Routes} from 'react-router-dom';
 import AdminStaffInfo from './components/AdminStaffInfo';
 import AdminReport from './components/AdminReport';
+import Profile from './components/Profile';
 function App() {
   return (
     <div className="App">
@@ -23,7 +24,7 @@ function App() {
         <Route path='/Signup' element={<SignUp/>}/>
         <Route path='/AdminStaffInfo' element={<AdminStaffInfo/>}/>
         <Route path='/AdminReport' element={<AdminReport/>}/>
-        
+        <Route path='/Profile' element={<Profile/>}/>
       </Routes>
       
       </BrowserRouter>

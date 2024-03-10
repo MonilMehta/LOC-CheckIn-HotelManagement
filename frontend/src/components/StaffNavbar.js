@@ -254,7 +254,9 @@ function ResponsiveAppBarStaff() {
                 onClose={handleCloseUserMenu}
               >
                 <MenuItem key="Profile" onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">Profile</Typography>
+                  <Typography textAlign="center">
+                    Profile
+                    </Typography>
                 </MenuItem>
                 <MenuItem key="Account" onClick={handleCloseUserMenu}>
                   <Typography textAlign="center">Account</Typography>

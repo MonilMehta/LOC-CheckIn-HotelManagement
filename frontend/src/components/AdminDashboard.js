@@ -1,75 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import ResponsiveAppBarAdmin from './AdminNavbar';
-import { Typography, Card, CardContent, Grid, TextField, Button } from '@mui/material';
+import { Typography, Grid } from '@mui/material';
 import Footer from './Footer';
-const StaffMain = () => {
+import RoomCard from './RoomCard';
+import PieActiveArc from './PieActiveArc';  // Import the PieActiveArc component
+
+const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [numberOfFloors, setNumberOfFloors] = useState(3);
   const [numberOfRooms, setNumberOfRooms] = useState(9);
   const [roomInspections, setRoomInspections] = useState([]);
   const [visitedRooms, setVisitedRooms] = useState(new Set());
-  const [editMode, setEditMode] = useState(false);
+
+  const fetchRoomData = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/api/room-status/', {
+        headers: {
+          Authorization: 'Token 77c80579fe6b77cb0cab3837e238c0ad94bf2afcbdec8ac4ef6f6e59ef76d55d',
+        },
+      });
+      setRoomInspections(response.data);
+    } catch (error) {
+      console.error('Error fetching room data:', error.message);
+    }
+  };
 
   useEffect(() => {
-    const totalRooms = numberOfFloors * numberOfRooms;
-
-    const inspections = Array.from({ length: totalRooms }, (_, index) => ({
-      roomNumber: String(index + 1),
-      cleanliness: 'Needs Improvement',
-      inventory: index % 3 === 0 ? 'Stocked' : 'Low Stock',
-    }));
-
-    setRoomInspections(inspections);
-  }, [numberOfFloors, numberOfRooms]);
-
-  const organizeRooms = (cleanlinessStatus) => {
-    const organizedRooms = {};
-    roomInspections
-      .filter((inspection) => inspection.cleanliness === cleanlinessStatus)
-      .forEach((inspection) => {
-        const floorNumber = Math.ceil(inspection.roomNumber / numberOfRooms);
-        if (!organizedRooms[floorNumber]) {
-          organizedRooms[floorNumber] = [];
-        }
-        organizedRooms[floorNumber].push(inspection);
-      });
-
-    return Object.entries(organizedRooms).map(([floor, rooms], floorIndex) => (
-      <div key={floorIndex}>
-        <Typography variant="h5" color="textPrimary" gutterBottom>
-          Floor {floor}
-        </Typography>
-        <Grid container spacing={2}>
-          {rooms.map((inspection, index) => (
-            <Grid item key={index} xs={12} sm={6} md={4}>
-              <Card
-                style={{
-                  cursor: 'pointer',
-                  backgroundColor: visitedRooms.has(inspection.roomNumber)
-                    ? '#c8e6c9'
-                    : 'white',
-                }}
-                onClick={() => handleRoomClick(inspection.roomNumber)}
-              >
-                <CardContent>
-                  <Typography variant="h6" color="textPrimary" gutterBottom>
-                    Room {inspection.roomNumber}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Cleanliness: {inspection.cleanliness}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Inventory: {inspection.inventory}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </div>
-    ));
-  };
+    fetchRoomData();
+  }, []);
 
   const handleRoomClick = (roomNumber) => {
     const floorNumber = Math.ceil(roomNumber / numberOfRooms);
@@ -77,64 +36,74 @@ const StaffMain = () => {
     setVisitedRooms((prevVisitedRooms) => new Set(prevVisitedRooms).add(roomNumber));
   };
 
-  const handleEdit = () => {
-    setEditMode(!editMode);
-  };
+  const organizeRooms = () => {
+    const cleanedRooms = [];
+    const underMaintenanceRooms = [];
 
-  const handleSave = () => {
-    setEditMode(false);
+    roomInspections.forEach((inspection) => {
+      const floorNumber = Math.ceil(inspection.room_number / numberOfRooms);
+
+      if (inspection.status === 'clean' && !inspection.flagged_for_maintenance) {
+        cleanedRooms.push({ ...inspection, floorNumber });
+      } else if (inspection.flagged_for_maintenance) {
+        underMaintenanceRooms.push({ ...inspection, floorNumber });
+      }
+    });
+
+    return (
+      <div>
+        <Typography variant="h5" color="textPrimary" gutterBottom>
+          Cleaned
+        </Typography>
+        <Grid container spacing={2}>
+          {cleanedRooms.map((inspection, index) => (
+            <Grid item key={index} xs={12} sm={6} md={4}>
+              <RoomCard
+                roomData={inspection}
+                handleRoomClick={handleRoomClick}
+                visited={visitedRooms.has(inspection.room_number)}
+              />
+            </Grid>
+          ))}
+        </Grid>
+
+        <Typography variant="h5" color="textPrimary" gutterBottom>
+          Under Maintenance
+        </Typography>
+        <Grid container spacing={2}>
+          {underMaintenanceRooms.map((inspection, index) => (
+            <Grid item key={index} xs={12} sm={6} md={4}>
+              <RoomCard
+                roomData={inspection}
+                handleRoomClick={handleRoomClick}
+                visited={visitedRooms.has(inspection.room_number)}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      </div>
+    );
   };
 
   return (
     <div>
       <ResponsiveAppBarAdmin />
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '20px',
-        }}
-      >
+      <div style={{ textAlign: 'center', padding: '20px' }}>
         <Typography variant="h3" color="textPrimary" gutterBottom>
           Admin Dashboard
         </Typography>
-        <div style={{ marginBottom: '20px' }}>
-          <TextField
-            label="Number of Floors"
-            type="number"
-            variant="outlined"
-            value={numberOfFloors}
-            onChange={(e) => setNumberOfFloors(Number(e.target.value))}
-            style={{ marginRight: '20px' }}
-            disabled={!editMode}
-          />
-          <TextField
-            label="Number of Rooms per Floor"
-            type="number"
-            variant="outlined"
-            value={numberOfRooms}
-            onChange={(e) => setNumberOfRooms(Number(e.target.value))}
-            disabled={!editMode}
-          />
-          {editMode ? (
-            <Button variant="contained" color="primary" onClick={handleSave}>
-              Save
-            </Button>
-          ) : (
-            <Button variant="contained" color="secondary" onClick={handleEdit}>
-              Edit
-            </Button>
-          )}
-        </div>
+        {/* Add Pie Chart component just below the header */}
+        <PieActiveArc />
         <div>
           <Typography variant="h5" color="textPrimary" gutterBottom>
-            Pending Rooms
+            Room Details
           </Typography>
-          {organizeRooms('Needs Improvement')}
+          {organizeRooms()}
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 };
 
-export default StaffMain;
+export default AdminDashboard;
