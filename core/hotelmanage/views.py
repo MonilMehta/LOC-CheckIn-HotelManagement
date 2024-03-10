@@ -2,6 +2,7 @@ import pandas as pd
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.permissions import AllowAny
 from django.http import JsonResponse
 
 from .models import RoomStatus
@@ -17,7 +18,6 @@ from django.core.files.base import ContentFile
 from ultralytics import YOLO
 from collections import Counter
 import numpy as np
-from .functions import generate_image, get_similarity_score, predict_step
 
 room_model = load_model('room.h5')
 model = YOLO("yolov8s.pt")
@@ -183,28 +183,3 @@ def inventory_check(request):
     else:
         return Response({"error": "Authentication failed"}, status=status.HTTP_401_UNAUTHORIZED)
 
-
-@csrf_exempt
-def process_images(request):
-    if request.method == 'POST':
-        # Process the request data
-        prompt = request.POST.get('prompt')
-        image_paths = request.FILES.getlist('images[]')
-        
-        # Generate and save the image
-        generate_image(prompt, image_gen_model, save_path)
-
-        # Calculate similarity score
-        similarity_score = get_similarity_score(img1, img2)
-
-        # Perform image captioning
-        captions = predict_step(image_paths)
-
-        # Return the results as JSON response
-        return JsonResponse({
-            'similarity_score': similarity_score,
-            'captions': captions
-        })
-
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=400)

@@ -16,7 +16,7 @@ const StaffMain = () => {
     try {
       const response = await axios.get('http://localhost:8000/api/room-status/', {
         headers: {
-          Authorization: 'Token 7456615913faabc16cec2f41ca04ea342a11b6035d139be6133a986933ebdccb',
+          Authorization: 'Token 25abde20b437f67da5d3ae6f23862f5285cf83bb452d17535d561cfcde0dc50b',
         },
       });
       setRoomInspections(response.data);
@@ -67,7 +67,7 @@ const StaffMain = () => {
         </Grid>
   
         <Typography variant="h5" color="textPrimary" gutterBottom>
-          Under Maintenance
+          Require Maintenance
         </Typography>
         <Grid container spacing={2}>
           {underMaintenanceRooms.map((inspection, index) => (

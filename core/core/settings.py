@@ -85,6 +85,12 @@ CORS_ALLOW_ALL_METHODS = True
 
 ROOT_URLCONF = "core.urls"
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    # Add more origins as needed, each as a string
+]
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
