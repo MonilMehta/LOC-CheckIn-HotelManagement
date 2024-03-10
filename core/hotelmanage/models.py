@@ -1,5 +1,6 @@
 from django.db import models
 from authentication.models import User
+from django.core.validators import MaxValueValidator
 
 class RoomStatus(models.Model):
     ROOM_STATUSES = (
@@ -8,18 +9,19 @@ class RoomStatus(models.Model):
     )
 
     room_number = models.CharField(max_length=50)
-    is_cleaned = models.BooleanField(default=False)  # Field to track if the room is cleaned
-    status = models.CharField(max_length=20, choices=ROOM_STATUSES, blank=True, null=True)
+    is_cleaned = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=ROOM_STATUSES, default='clean')
     last_checked = models.DateTimeField(auto_now=True)
-    employee = models.ForeignKey(User, on_delete=models.CASCADE)
+    employee = models.ForeignKey(User, on_delete=models.CASCADE, default=None)  # Default value set to None
     progress_description = models.TextField(blank=True, null=True)
     room_image = models.ImageField(upload_to='room_images/', blank=True, null=True)
     flagged_for_maintenance = models.BooleanField(default=False)
 
     # Inventory fields
-    toiletries = models.PositiveIntegerField(default=0)
-    towels = models.PositiveIntegerField(default=0)
-    minibar_items = models.PositiveIntegerField(default=0)
+    bottle = models.PositiveIntegerField(default=0, validators=[MaxValueValidator(2)])
+    cup = models.PositiveIntegerField(default=0, validators=[MaxValueValidator(4)])
+    wine_glass = models.PositiveIntegerField(default=0, validators=[MaxValueValidator(2)])
+    bowl = models.PositiveIntegerField(default=0, validators=[MaxValueValidator(4)])
 
     def __str__(self):
         return f"Room {self.room_number} - {self.status}"

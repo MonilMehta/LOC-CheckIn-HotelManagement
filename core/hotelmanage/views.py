@@ -1,24 +1,33 @@
+import pandas as pd
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from django.views.decorators.csrf import csrf_exempt
+
 from .models import RoomStatus
 from .serializers import RoomStatusCreateSerializer, RoomStatusSerializer
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view # Import function to process room image
+from rest_framework.decorators import api_view
 from keras.applications.xception import Xception
 from keras.models import load_model
-import cv2 as cv
+import cv2 as cv2
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from ultralytics import YOLO
+from collections import Counter
 import numpy as np
 
 room_model = load_model('room.h5')
+model = YOLO("yolov8s.pt")
+
+my_file = open(r"coco.txt", "r")
+data = my_file.read()
+class_list = data.split("\n")
+
 class RoomStatusViewSet(viewsets.ModelViewSet):
     queryset = RoomStatus.objects.all()
     serializer_class = RoomStatusSerializer
     permission_classes = [IsAuthenticated]
-
-# views.py
 
 def preprocess_image(image):
     # calculate from the training set
@@ -33,8 +42,8 @@ def preprocess_image(image):
 
 def predict_single_image(image_path, base_model, room_model):
     # Load and preprocess the image
-    image = cv.imread(image_path)
-    image_rgb = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+    image = cv2.imread(image_path)
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     processed_image = preprocess_image(image.copy())
     processed_image = np.expand_dims(processed_image, axis=0)
 
@@ -56,15 +65,25 @@ def createroom(request):
             room_image = serializer.validated_data.get('room_image')
             image_content = ContentFile(room_image.read())
             image_name = room_image.name
-            image_path = default_storage.save(f'D:/Django2/project/core/room_images/{image_name}', image_content)
+            image_path = default_storage.save(f'D:/Hackathon/LOC/core/room_images/{image_name}', image_content)
+
+
 
             # Process the room image
             base_model = Xception(include_top=False, weights='imagenet', pooling='avg')
             image, prediction = predict_single_image(image_path, base_model, room_model)
+            room_status = None  # Define room_status
+
             print(prediction[0][0])
 
+            if prediction[0][0] <0.6:
+                print('Ok')
+                room_status = 'clean'
+            else:
+                room_status = 'messy'
+
             # Set room status
-            room_status = None  # Define room_status
+            print(f'Room status-{room_status}')
             serializer.validated_data['status'] = room_status
 
             # Save room status
@@ -86,7 +105,9 @@ def createroom(request):
             room_image = serializer.validated_data.get('room_image')
             image_content = ContentFile(room_image.read())
             image_name = room_image.name
-            image_path = default_storage.save(f'D:/Django2/project/core/room_images/{image_name}', image_content)
+            image_path = default_storage.save(f'D:/Hackathon/LOC/core/room_images/{image_name}', image_content)
+
+
 
             # Process the room image
             base_model = Xception(include_top=False, weights='imagenet', pooling='avg')
@@ -96,3 +117,61 @@ def createroom(request):
             room_status.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+def detect_objects_and_count(img):
+    results = model.predict(img)
+    a = results[0].boxes.data
+    px = pd.DataFrame(a).astype("float")
+    object_classes = []
+
+    for index, row in px.iterrows():
+        x1 = int(row[0])
+        y1 = int(row[1])
+        x2 = int(row[2])
+        y2 = int(row[3])
+        d = int(row[5])
+        if d < len(class_list):  # Check if d is within the valid range
+            obj_class = class_list[d]
+            object_classes.append(obj_class)
+            cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 255), 2)
+            cv2.putText(img, f'{obj_class}', (x2, y2), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2, cv2.LINE_AA)
+
+    counter = Counter(object_classes)
+    print("Object Count in Image:")
+    for obj, count in counter.items():
+        print(f"{obj}: {count}")
+
+    return counter
+
+@api_view(['POST'])
+@csrf_exempt
+def inventory_check(request):
+    if request.method == 'POST' and request.FILES.get('image'):
+        # Get the uploaded image file
+        image_file = request.FILES['image']
+        
+        # Perform object detection on the uploaded image
+        image = cv2.imdecode(np.fromstring(image_file.read(), np.uint8), cv2.IMREAD_COLOR)
+        image = cv2.resize(image, (1020, 500))
+        
+        # Detect objects and count them
+        object_counts = detect_objects_and_count(image)
+        
+        # Update RoomStatus object with the counts
+        room_status = RoomStatus.objects.create(
+            room_number=request.data.get('room_number'),
+            status=request.data.get('status'),
+            # Add other fields as necessary
+            bottle=object_counts.get('bottle', 0),
+            cup=object_counts.get('cup', 0),
+            wine_glass=object_counts.get('wine_glass', 0),
+            bowl=object_counts.get('bowl', 0)
+        )
+        
+        # Construct the response JSON data
+        response_data = {
+            "inventory_counts": object_counts
+        }
+        
+        return Response(response_data, status=status.HTTP_201_CREATED)
+    else:
+        return Response({"error": "Please provide an image file via POST request."}, status=status.HTTP_400_BAD_REQUEST)
