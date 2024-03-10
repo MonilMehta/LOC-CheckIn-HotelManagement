@@ -1,9 +1,9 @@
 import React from 'react';
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
-import RoomAssessmentImage from './images/11132246.jpg';
-import InventoryCheckImage from './images/5052358.jpg';
-import IdealRoomImage from './images/5052364.png';
+import RoomAssessmentImage from './images/img1.jpeg';
+import InventoryCheckImage from './images/img2.jpeg';
+import IdealRoomImage from './images/img3.jpeg';
 
 const HomeCarou = () => {
   return (
