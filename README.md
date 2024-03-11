@@ -1,2 +1,2 @@
 # LOC
- A projecct made as part of LOC Hackathon
+ A project made as part of LOC Hackathon
