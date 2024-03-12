@@ -7,6 +7,7 @@ const Container = styled.div`
   background-color: #212121; /* Dark background color */
   color: white; /* Text color */
   padding: 30px;
+  margin-top: 100px;
   ${mobile({ flexDirection: "column" })}
 `;
 
@@ -31,7 +32,7 @@ const Description = styled.p`
 
 const SocialContainer = styled.div`
   display: flex;
-  margin-top: 20px;
+  margin-top: 40px;
 `;
 
 const SocialIcon = styled.div`

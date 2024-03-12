@@ -1,23 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import ResponsiveAppBarAdmin from './AdminNavbar';
+import ResponsiveAppBarStaff from './StaffNavbar';
 import { Typography, Grid } from '@mui/material';
 import Footer from './Footer';
-import RoomCard from './RoomCard';
-import PieActiveArc from './PieActiveArc';  // Import the PieActiveArc component
+import RoomCard from './RoomCard';  // Import the RoomCard component
+import { useAuth } from '../AuthContext';
 
-const AdminDashboard = () => {
+const StaffMain = () => {
   const navigate = useNavigate();
   const [numberOfRooms, setNumberOfRooms] = useState(9);
   const [roomInspections, setRoomInspections] = useState([]);
   const [visitedRooms, setVisitedRooms] = useState(new Set());
+  const { token } = useAuth(); 
+  console.log('Token : '+token)
 
   const fetchRoomData = async () => {
     try {
       const response = await axios.get('http://localhost:8000/api/room-status/', {
         headers: {
-          Authorization: 'Token 77c80579fe6b77cb0cab3837e238c0ad94bf2afcbdec8ac4ef6f6e59ef76d55d',
+          Authorization: `Token ${token}`,
         },
       });
       setRoomInspections(response.data);
@@ -31,25 +33,25 @@ const AdminDashboard = () => {
   }, []);
 
   const handleRoomClick = (roomNumber) => {
-    const floorNumber = Math.ceil(roomNumber / numberOfRooms);
-    navigate(`/AdminReport`, { state: { floorNumber, roomNumber } });
+    navigate(`/StaffDashboard`, { state: {  roomNumber } });
     setVisitedRooms((prevVisitedRooms) => new Set(prevVisitedRooms).add(roomNumber));
   };
 
+  
   const organizeRooms = () => {
     const cleanedRooms = [];
     const underMaintenanceRooms = [];
-
+  
     roomInspections.forEach((inspection) => {
       const floorNumber = Math.ceil(inspection.room_number / numberOfRooms);
-
+  
       if (inspection.status === 'clean' && !inspection.flagged_for_maintenance) {
         cleanedRooms.push({ ...inspection, floorNumber });
       } else if (inspection.flagged_for_maintenance) {
         underMaintenanceRooms.push({ ...inspection, floorNumber });
       }
     });
-
+  
     return (
       <div>
         <Typography variant="h5" color="textPrimary" gutterBottom>
@@ -66,9 +68,9 @@ const AdminDashboard = () => {
             </Grid>
           ))}
         </Grid>
-
+  
         <Typography variant="h5" color="textPrimary" gutterBottom>
-          Under Maintenance
+          Require Maintenance
         </Typography>
         <Grid container spacing={2}>
           {underMaintenanceRooms.map((inspection, index) => (
@@ -84,16 +86,15 @@ const AdminDashboard = () => {
       </div>
     );
   };
+  
 
   return (
     <div>
-      <ResponsiveAppBarAdmin />
+      <ResponsiveAppBarStaff />
       <div style={{ textAlign: 'center', padding: '20px' }}>
         <Typography variant="h3" color="textPrimary" gutterBottom>
-          Admin Dashboard
+          Staff Dashboard
         </Typography>
-        {/* Add Pie Chart component just below the header */}
-        <PieActiveArc />
         <div>
           <Typography variant="h5" color="textPrimary" gutterBottom>
             Room Details
@@ -106,5 +107,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
-
+export default StaffMain;

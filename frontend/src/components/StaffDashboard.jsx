@@ -6,10 +6,12 @@ import Modal from 'react-modal';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import SendIcon from '@mui/icons-material/Send';
 import Footer from './Footer';
+import { useAuth } from '../AuthContext';
+import axios from 'axios';
 
 const StaffDashboard = () => {
   const location = useLocation();
-  const { floorNumber, roomNumber } = location.state || {};
+  const {  roomNumber } = location.state || {};
 
   const [filesCleanliness, setFilesCleanliness] = useState([]);
   const [filesInventory, setFilesInventory] = useState([]);
@@ -38,8 +40,11 @@ const StaffDashboard = () => {
     updatedFiles.splice(index, 1);
     setFilesInventory(updatedFiles);
   };
+  const {token}=useAuth();
+  console.log('Token : ' + token)
 
   const handleSubmit = async () => {
+    
     const cleanlinessSubmissionData = {
       type: 'Cleanliness Check',
       time: new Date().toLocaleString(),
@@ -65,9 +70,10 @@ const StaffDashboard = () => {
       cleanlinessSubmissionData.images.forEach((file) => {
         cleanlinessFormData.append('room_image', file);
       });
-      const cleanlinessResponse = await fetch(cleanlinessEndpoint, {
-        method: 'POST',
-        body: cleanlinessFormData,
+      const cleanlinessResponse = await axios.post(cleanlinessEndpoint, cleanlinessFormData, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
       });
       console.log('Cleanliness Response:', cleanlinessResponse);
   
@@ -77,9 +83,10 @@ const StaffDashboard = () => {
           const inventoryFormData = new FormData();
           inventoryFormData.append('room_number', roomNumber);
           inventoryFormData.append('image', file);
-          return fetch(inventoryEndpoint, {
-            method: 'POST',
-            body: inventoryFormData,
+          return axios.post(inventoryEndpoint, inventoryFormData, {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
           });
         })
       );
@@ -95,15 +102,6 @@ const StaffDashboard = () => {
       console.error('Error submitting data:', error);
       // Handle error as needed
     }
-  };
-  const openModal = (index) => {
-    setSelectedImageIndex(index);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setSelectedImageIndex(null);
-    setIsModalOpen(false);
   };
 
   return (
@@ -157,7 +155,7 @@ const StaffDashboard = () => {
               style={{
                 width: '80%',
                 height: 'auto',
-                marginTop: '10px',
+                marginTop: '20px',
                 overflow: 'hidden',
                 position: 'relative',
               }}
@@ -244,6 +242,7 @@ const StaffDashboard = () => {
                   right: 0,
                   padding: '2px',
                   borderRadius: '50%',
+                  marginTop:'40px'
                 }}
               >
                 &#10005;
@@ -265,62 +264,6 @@ const StaffDashboard = () => {
           >
             Submit
           </Button>
-
-          {/* Submitted Data */}
-          <Box sx={{ marginTop: '20px', textAlign: 'left' }}>
-  <Typography variant="h5" color="textPrimary" gutterBottom>
-    Submitted Data:
-  </Typography>
-  {submittedData.map((data, index) => (
-    <div key={index}>
-      <Typography variant="body1" color="textSecondary">
-        Time: {data.time}
-      </Typography>
-      <Typography variant="body1" color="textSecondary">
-        Type: {data.type}
-      </Typography>
-      <Typography variant="body1" color="textSecondary">
-        Room Number: {data.roomNumber}
-      </Typography>
-      <Typography variant="body1" color="textSecondary">
-        Images:
-        {data.images && data.images.map((image, imageIndex) => (
-          <img
-            key={imageIndex}
-            src={image}
-            alt={`Selected Image ${imageIndex + 1}`}
-            style={{ width: '50px', height: 'auto', marginRight: '5px' }}
-          />
-        ))}
-      </Typography>
-      <hr />
-    </div>
-  ))}
-</Box>
-
-          {/* Modal */}
-          <Modal
-            isOpen={isModalOpen}
-            onRequestClose={closeModal}
-            contentLabel="Uploaded Image"
-          >
-            {selectedImageIndex !== null && (
-              <img
-                src={
-                  filesCleanliness[selectedImageIndex].type &&
-                  filesCleanliness[selectedImageIndex].type.startsWith('image/')
-                    ? URL.createObjectURL(filesCleanliness[selectedImageIndex])
-                    : ''
-                }
-                alt={`Selected Image ${selectedImageIndex + 1}`}
-                style={{
-                  width: '70%',
-                  justifyContent: 'center',
-                  display: 'flex',
-                }}
-              />
-            )}
-          </Modal>
         </Box>
       </Container>
       <Footer />

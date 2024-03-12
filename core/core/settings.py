@@ -64,11 +64,12 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-     'django.middleware.common.CommonMiddleware',
+    'django.middleware.common.CommonMiddleware',
     
 ]
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',  # or your frontend URL
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    'http://localhost:3000',
+    'http://localhost:5173',  # or your frontend URL
     # Add more allowed origins as needed
 ]
 KNOX_AUTH = {
@@ -88,6 +89,7 @@ ROOT_URLCONF = "core.urls"
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:5173",
     # Add more origins as needed, each as a string
 ]
 

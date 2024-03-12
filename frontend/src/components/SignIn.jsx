@@ -3,8 +3,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -18,18 +16,17 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from '../AuthContext'; // Import the AuthContext
 
 function SignIn() {
-  const [validationErrors, setValidationErrors] = useState({});
-  const [role, setRole] = useState('admin'); // Default role is admin
-  const navigate = useNavigate(); // Use useNavigate to navigate between routes
+  const { login } = useAuth(); // Use the useAuth hook to access the context
+  const navigate = useNavigate();
+  const [role, setRole] = useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-
-    const username = data.get('username');
-    const password = data.get('password');
+    data.append('role', role);
 
     try {
       const response = await axios.post(
@@ -37,14 +34,17 @@ function SignIn() {
         data,
         {
           headers: {
-            'Content-Type': 'multipart/form-data', // Set content type for FormData
+            'Content-Type': 'multipart/form-data',
           },
         }
       );
 
       console.log('Response:', response.data);
 
-      // Redirect to the appropriate dashboard based on the role
+      // Set token in AuthContext
+      login(response.data.token);
+
+      // Redirect based on selected role
       if (role === 'admin') {
         navigate('/AdminDashboard');
       } else if (role === 'staff') {
@@ -52,11 +52,6 @@ function SignIn() {
       }
     } catch (error) {
       console.log('Error:', error);
-
-      // Handle validation errors or other errors as needed
-      if (error.response && error.response.data) {
-        setValidationErrors(error.response.data);
-      }
     }
   };
 
@@ -90,8 +85,6 @@ function SignIn() {
               name="username"
               autoComplete="username"
               autoFocus
-              error={!!validationErrors.username}
-              helperText={validationErrors.username}
             />
             <TextField
               margin="normal"
@@ -102,8 +95,6 @@ function SignIn() {
               type="password"
               id="password"
               autoComplete="current-password"
-              error={!!validationErrors.password}
-              helperText={validationErrors.password}
             />
             <FormControl fullWidth sx={{ mt: 2 }}>
               <InputLabel id="role-label">Role</InputLabel>
@@ -118,10 +109,6 @@ function SignIn() {
                 <MenuItem value="staff">Staff</MenuItem>
               </Select>
             </FormControl>
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
             <Button
               type="submit"
               fullWidth

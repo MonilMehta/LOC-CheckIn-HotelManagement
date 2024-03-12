@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import ResponsiveAppBarStaff from './StaffNavbar';
 import { Typography, Grid } from '@mui/material';
+import ResponsiveAppBarAdmin from './AdminNavbar';
 import Footer from './Footer';
-import RoomCard from './RoomCard';  // Import the RoomCard component
+import RoomCard from './RoomCard';
+import PieActiveArc from './PieActiveArc';
 
-const StaffMain = () => {
+const AdminDashboard = () => {
   const navigate = useNavigate();
   const [numberOfRooms, setNumberOfRooms] = useState(9);
   const [roomInspections, setRoomInspections] = useState([]);
@@ -16,7 +17,7 @@ const StaffMain = () => {
     try {
       const response = await axios.get('http://localhost:8000/api/room-status/', {
         headers: {
-          Authorization: 'Token 25abde20b437f67da5d3ae6f23862f5285cf83bb452d17535d561cfcde0dc50b',
+          Authorization: 'Token 77c80579fe6b77cb0cab3837e238c0ad94bf2afcbdec8ac4ef6f6e59ef76d55d',
         },
       });
       setRoomInspections(response.data);
@@ -30,25 +31,25 @@ const StaffMain = () => {
   }, []);
 
   const handleRoomClick = (roomNumber) => {
-    navigate(`/StaffDashboard`, { state: {  roomNumber } });
+    const floorNumber = Math.ceil(roomNumber / numberOfRooms);
+    navigate(`/AdminReport`, { state: { floorNumber, roomNumber } });
     setVisitedRooms((prevVisitedRooms) => new Set(prevVisitedRooms).add(roomNumber));
   };
 
-  
   const organizeRooms = () => {
     const cleanedRooms = [];
     const underMaintenanceRooms = [];
-  
+
     roomInspections.forEach((inspection) => {
       const floorNumber = Math.ceil(inspection.room_number / numberOfRooms);
-  
+
       if (inspection.status === 'clean' && !inspection.flagged_for_maintenance) {
         cleanedRooms.push({ ...inspection, floorNumber });
       } else if (inspection.flagged_for_maintenance) {
         underMaintenanceRooms.push({ ...inspection, floorNumber });
       }
     });
-  
+
     return (
       <div>
         <Typography variant="h5" color="textPrimary" gutterBottom>
@@ -65,9 +66,9 @@ const StaffMain = () => {
             </Grid>
           ))}
         </Grid>
-  
+
         <Typography variant="h5" color="textPrimary" gutterBottom>
-          Require Maintenance
+          Under Maintenance
         </Typography>
         <Grid container spacing={2}>
           {underMaintenanceRooms.map((inspection, index) => (
@@ -83,15 +84,15 @@ const StaffMain = () => {
       </div>
     );
   };
-  
 
   return (
     <div>
-      <ResponsiveAppBarStaff />
+      <ResponsiveAppBarAdmin />
       <div style={{ textAlign: 'center', padding: '20px' }}>
         <Typography variant="h3" color="textPrimary" gutterBottom>
-          Staff Dashboard
+          Admin Dashboard
         </Typography>
+        <PieActiveArc /> {/* Include PieActiveArc component */}
         <div>
           <Typography variant="h5" color="textPrimary" gutterBottom>
             Room Details
@@ -104,4 +105,4 @@ const StaffMain = () => {
   );
 };
 
-export default StaffMain;
+export default AdminDashboard;
