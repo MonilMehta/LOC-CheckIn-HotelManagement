@@ -9,7 +9,6 @@ import { useAuth } from '../AuthContext';
 
 const StaffMain = () => {
   const navigate = useNavigate();
-  const [numberOfRooms, setNumberOfRooms] = useState(9);
   const [roomInspections, setRoomInspections] = useState([]);
   const [visitedRooms, setVisitedRooms] = useState(new Set());
   const { token } = useAuth(); 
@@ -29,26 +28,25 @@ const StaffMain = () => {
   };
 
   useEffect(() => {
-    fetchRoomData();
-  }, []);
+    if (token) {
+      fetchRoomData();
+    }
+  }, [token]);
 
   const handleRoomClick = (roomNumber) => {
-    navigate(`/StaffDashboard`, { state: {  roomNumber } });
+    navigate(`/StaffDashboard`, { state: { roomNumber } });
     setVisitedRooms((prevVisitedRooms) => new Set(prevVisitedRooms).add(roomNumber));
   };
 
-  
   const organizeRooms = () => {
     const cleanedRooms = [];
     const underMaintenanceRooms = [];
   
     roomInspections.forEach((inspection) => {
-      const floorNumber = Math.ceil(inspection.room_number / numberOfRooms);
-  
-      if (inspection.status === 'clean' && !inspection.flagged_for_maintenance) {
-        cleanedRooms.push({ ...inspection, floorNumber });
-      } else if (inspection.flagged_for_maintenance) {
-        underMaintenanceRooms.push({ ...inspection, floorNumber });
+      if (inspection.status === 'clean' ) {
+        cleanedRooms.push({ ...inspection });
+      } else if (inspection.status === 'maintenance' ) {
+        underMaintenanceRooms.push({ ...inspection });
       }
     });
   
@@ -86,22 +84,11 @@ const StaffMain = () => {
       </div>
     );
   };
-  
 
   return (
     <div>
       <ResponsiveAppBarStaff />
-      <div style={{ textAlign: 'center', padding: '20px' }}>
-        <Typography variant="h3" color="textPrimary" gutterBottom>
-          Staff Dashboard
-        </Typography>
-        <div>
-          <Typography variant="h5" color="textPrimary" gutterBottom>
-            Room Details
-          </Typography>
-          {organizeRooms()}
-        </div>
-      </div>
+      {organizeRooms()}
       <Footer />
     </div>
   );

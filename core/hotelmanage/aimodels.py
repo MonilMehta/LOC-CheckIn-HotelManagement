@@ -38,11 +38,11 @@ def predict_single_image(image_path):
 
     # Make predictions using the room model
     prediction = room_model.predict(features)
+    print(prediction)
 
     return image_rgb, prediction
 
-def detect_objects_and_count(image):
-    image_file = open("path/to/image.jpg", "rb")  # Replace "path/to/image.jpg" with the actual path to the image file
+def detect_objects_and_count(image_file):
     image = cv2.imdecode(np.fromstring(image_file.read(), np.uint8), cv2.IMREAD_COLOR)
     img = cv2.resize(image, (1020, 500))
     results = model.predict(img)

@@ -15,7 +15,6 @@ const StaffDashboard = () => {
 
   const [filesCleanliness, setFilesCleanliness] = useState([]);
   const [filesInventory, setFilesInventory] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
   const [submittedData, setSubmittedData] = useState([]);
 
