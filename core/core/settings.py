@@ -11,9 +11,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 KNOX_AUTH = {
     'TOKEN_TTL': None,  # Tokens will never expire
@@ -65,8 +64,13 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'django.middleware.common.CommonMiddleware',
-    
 ]
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = 'D:/Hackathon/LOC/core/'
+
 CORS_ALLOWED_ORIGIN_REGEXES = [
     'http://localhost:3000',
     'http://localhost:5173',  # or your frontend URL

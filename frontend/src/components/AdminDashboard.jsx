@@ -6,21 +6,27 @@ import ResponsiveAppBarAdmin from './AdminNavbar';
 import Footer from './Footer';
 import RoomCard from './RoomCard';
 import PieActiveArc from './PieActiveArc';
+import { useAuth } from '../AuthContext'; // Import useAuth hook from AuthContext
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [numberOfRooms, setNumberOfRooms] = useState(9);
+  const [numberOfRooms, setNumberOfRooms] = useState(0);
   const [roomInspections, setRoomInspections] = useState([]);
   const [visitedRooms, setVisitedRooms] = useState(new Set());
+  const { token } = useAuth(); // Access the authentication token from AuthContext
+
+  const [cleanedRooms, setCleanedRooms] = useState([]);
+  const [underMaintenanceRooms, setUnderMaintenanceRooms] = useState([]);
 
   const fetchRoomData = async () => {
     try {
       const response = await axios.get('http://localhost:8000/api/room-status/', {
         headers: {
-          Authorization: 'Token 77c80579fe6b77cb0cab3837e238c0ad94bf2afcbdec8ac4ef6f6e59ef76d55d',
+          Authorization: `Token ${token}`, // Include authentication token in request headers
         },
       });
       setRoomInspections(response.data);
+      setNumberOfRooms(response.data.length);
     } catch (error) {
       console.error('Error fetching room data:', error.message);
     }
@@ -28,62 +34,28 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchRoomData();
-  }, []);
+  }, [token]); // Fetch room data when the component mounts
 
   const handleRoomClick = (roomNumber) => {
-    const floorNumber = Math.ceil(roomNumber / numberOfRooms);
-    navigate(`/AdminReport`, { state: { floorNumber, roomNumber } });
+    navigate(`/AdminReport`, { state: { roomNumber } });
     setVisitedRooms((prevVisitedRooms) => new Set(prevVisitedRooms).add(roomNumber));
   };
 
-  const organizeRooms = () => {
-    const cleanedRooms = [];
-    const underMaintenanceRooms = [];
+  useEffect(() => {
+    const cleaned = [];
+    const maintenance = [];
 
     roomInspections.forEach((inspection) => {
-      const floorNumber = Math.ceil(inspection.room_number / numberOfRooms);
-
-      if (inspection.status === 'clean' && !inspection.flagged_for_maintenance) {
-        cleanedRooms.push({ ...inspection, floorNumber });
-      } else if (inspection.flagged_for_maintenance) {
-        underMaintenanceRooms.push({ ...inspection, floorNumber });
+      if (inspection.status === 'clean') {
+        cleaned.push({ ...inspection });
+      } else if (inspection.status === 'maintenance') {
+        maintenance.push({ ...inspection });
       }
     });
 
-    return (
-      <div>
-        <Typography variant="h5" color="textPrimary" gutterBottom>
-          Cleaned
-        </Typography>
-        <Grid container spacing={2}>
-          {cleanedRooms.map((inspection, index) => (
-            <Grid item key={index} xs={12} sm={6} md={4}>
-              <RoomCard
-                roomData={inspection}
-                handleRoomClick={handleRoomClick}
-                visited={visitedRooms.has(inspection.room_number)}
-              />
-            </Grid>
-          ))}
-        </Grid>
-
-        <Typography variant="h5" color="textPrimary" gutterBottom>
-          Under Maintenance
-        </Typography>
-        <Grid container spacing={2}>
-          {underMaintenanceRooms.map((inspection, index) => (
-            <Grid item key={index} xs={12} sm={6} md={4}>
-              <RoomCard
-                roomData={inspection}
-                handleRoomClick={handleRoomClick}
-                visited={visitedRooms.has(inspection.room_number)}
-              />
-            </Grid>
-          ))}
-        </Grid>
-      </div>
-    );
-  };
+    setCleanedRooms(cleaned);
+    setUnderMaintenanceRooms(maintenance);
+  }, [roomInspections]);
 
   return (
     <div>
@@ -92,12 +64,44 @@ const AdminDashboard = () => {
         <Typography variant="h3" color="textPrimary" gutterBottom>
           Admin Dashboard
         </Typography>
-        <PieActiveArc /> {/* Include PieActiveArc component */}
+        <PieActiveArc length1={cleanedRooms.length} length2={underMaintenanceRooms.length} /> {/* Include PieActiveArc component */}
         <div>
           <Typography variant="h5" color="textPrimary" gutterBottom>
             Room Details
           </Typography>
-          {organizeRooms()}
+          <div>
+            <Typography variant="h5" color="textPrimary" gutterBottom>
+              Cleaned
+            </Typography>
+            <Grid container spacing={2}>
+              {cleanedRooms.map((inspection, index) => (
+                <Grid item key={index} xs={12} sm={6} md={4}>
+                  <RoomCard
+                    roomData={inspection}
+                    handleRoomClick={handleRoomClick}
+                    visited={visitedRooms.has(inspection.room_number)}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </div>
+
+          <div>
+            <Typography variant="h5" color="textPrimary" gutterBottom>
+              Under Maintenance
+            </Typography>
+            <Grid container spacing={2}>
+              {underMaintenanceRooms.map((inspection, index) => (
+                <Grid item key={inspection.room_number} xs={12} sm={6} md={4}>
+                  <RoomCard
+                    roomData={inspection}
+                    handleRoomClick={handleRoomClick}
+                    visited={visitedRooms.has(inspection.room_number)}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </div>
         </div>
       </div>
       <Footer />
