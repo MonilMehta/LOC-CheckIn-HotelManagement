@@ -85,14 +85,32 @@ npm run dev
 
 ## Screenshots
 
-![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/Untitled1.png
+home page:
+
+![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/Untitled1.png)
 ![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/Untitled.png)
+
+sign up:
+
 ![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/Untitled2.png)
+
+sign in:
+
 ![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/Untitled3.png)
+
+staff dashboard:
+
 ![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/Untitled5.png)
+
+uploading the image :
 ![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/Untitled6.png)
 ![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/Untitled7.png)
+
+
+updates on staff dashboard:
 ![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/qd.png)
+
+admin dashboard:
 ![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/34.png)
 
 
