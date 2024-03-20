@@ -82,13 +82,36 @@ npm install
 ```bash
 npm run dev
 ```
-## Contributing
-
-Contributions are always welcome!
-. If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
-
 
 ## Screenshots
 
-![App Screenshot]()
+![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/Untitled1.png
+![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/Untitled.png)
+![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/Untitled2.png)
+![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/Untitled3.png)
+![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/Untitled5.png)
+![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/Untitled6.png)
+![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/Untitled7.png)
+![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/qd.png)
+![App Screenshot](https://github.com/MonilMehta/LOC-CheckIn-HotelManagement/blob/main/photo/34.png)
+
+
+## Contributing
+
+Contributions are always welcome!😊
+. If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
