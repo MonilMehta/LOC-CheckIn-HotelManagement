@@ -50,17 +50,6 @@ cd core
 Pip install -r requirements.txt
 ```
     
-## Acknowledgements
-
-- This project was inspired by the need for efficient hotel management systems in the hospitality industry.
-
-- Special acknowledgment to the developers of the libraries and frameworks used in this project.
-
-
-
-
-
-
 ## Usage
 1.run the server
 
@@ -118,6 +107,13 @@ admin dashboard:
 
 Contributions are always welcome!😊
 . If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
+
+## Acknowledgements
+
+- This project was inspired by the need for efficient hotel management systems in the hospitality industry.
+- Special acknowledgment to the developers of the libraries and frameworks used in this project.
+
+
 
 
 
