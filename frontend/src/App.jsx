@@ -11,6 +11,7 @@ import StaffMain from './components/StaffMain.jsx';
 import AdminStaffInfo from './components/AdminStaffInfo.jsx';
 import AdminReport from './components/AdminReport.jsx';
 import Profile from './components/Profile.jsx';
+import AddRoom from './components/AddRoom'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/StaffMain' element={<StaffMain />} />
+            <Route path='/add-room' element={<AddRoom/>} />
             <Route path='/AdminDashboard' element={<AdminDashboard />} />
             <Route path='/StaffDashboard' element={<StaffDashboard />} />
             <Route path='/SignIn' element={<SignIn />} />

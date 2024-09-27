@@ -7,4 +7,4 @@ class HotelmanageConfig(AppConfig):
 
     def ready(self):
         # No initialization needed
-        pass
+        import hotelmanage.signals

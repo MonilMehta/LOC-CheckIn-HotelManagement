@@ -11,7 +11,7 @@ class RoomStatus(models.Model):
     room_number = models.CharField(max_length=50)
     status = models.CharField(max_length=20, choices=ROOM_STATUSES, default='clean')
     last_checked = models.DateTimeField(auto_now=True)
-    employee = models.ForeignKey(User, on_delete=models.CASCADE, default=1)  # Default value set to None
+    employee = models.ForeignKey(User, on_delete=models.CASCADE)  # Default value set to None
     progress_description = models.TextField(blank=True, null=True)
     room_image = models.ImageField(upload_to='room_images/', blank=True, null=True)
     
@@ -47,3 +47,12 @@ class RoomStatus(models.Model):
         
         print("Updated status:", self.status)
         super().save(*args, **kwargs)
+
+class RoomCleanLog(models.Model):
+    employee = models.ForeignKey(User, on_delete=models.CASCADE)
+    room = models.ForeignKey(RoomStatus, on_delete=models.CASCADE)
+    clean_date = models.DateTimeField(auto_now_add=True)
+    success = models.BooleanField(default=False)  # Did the staff clean it properly?
+
+    def __str__(self):
+        return f"Room {self.room.room_number} cleaned by {self.employee.username}"
