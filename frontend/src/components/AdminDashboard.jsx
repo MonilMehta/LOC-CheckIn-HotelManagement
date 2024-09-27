@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { styled } from '@mui/material/styles';
@@ -19,6 +19,7 @@ import {
   CardActionArea, Chip, LinearProgress, Avatar, Modal
 } from '@mui/material';
 import AdminReport from './AdminReport';
+import { useAuth } from '../context/AuthContext';
 
 const StyledCard = styled(Card)(({ theme }) => ({
   height: '100%',
@@ -81,7 +82,6 @@ const AdminDashboard = () => {
   const handleCloseModal = () => {
     setSelectedRoom(null);
   };
-
   const fetchRoomData = async () => {
     try {
       const response = await axios.get('http://localhost:8000/api/room-status/', {

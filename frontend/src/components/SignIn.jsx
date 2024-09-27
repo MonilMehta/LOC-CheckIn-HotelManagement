@@ -16,17 +16,22 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from '../AuthContext'; // Import the AuthContext
+import { useAuth } from '../context/AuthContext';
 
 function SignIn() {
   const { login } = useAuth(); // Use the useAuth hook to access the context
   const navigate = useNavigate();
   const [role, setRole] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     data.append('role', role);
+
+    setLoading(true);
+    setError('');
 
     try {
       const response = await axios.post(
@@ -52,6 +57,9 @@ function SignIn() {
       }
     } catch (error) {
       console.log('Error:', error);
+      setError('Failed to sign in. Please check your credentials and try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -75,6 +83,11 @@ function SignIn() {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
+          {error && (
+            <Typography color="error" variant="body2">
+              {error}
+            </Typography>
+          )}
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
@@ -85,6 +98,7 @@ function SignIn() {
               name="username"
               autoComplete="username"
               autoFocus
+              disabled={loading}
             />
             <TextField
               margin="normal"
@@ -95,8 +109,9 @@ function SignIn() {
               type="password"
               id="password"
               autoComplete="current-password"
+              disabled={loading}
             />
-            <FormControl fullWidth sx={{ mt: 2 }}>
+            <FormControl fullWidth sx={{ mt: 2 }} disabled={loading}>
               <InputLabel id="role-label">Role</InputLabel>
               <Select
                 labelId="role-label"
@@ -114,8 +129,9 @@ function SignIn() {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              disabled={loading}
             >
-              Sign In
+              {loading ? 'Signing In...' : 'Sign In'}
             </Button>
             <Grid container>
               <Grid item xs>
