@@ -1,10 +1,9 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { styled } from '@mui/material/styles';
 import ResponsiveAppBarAdmin from './AdminNavbar';
 import Footer from './Footer';
-import { useAuth } from '../AuthContext';
 import BedIcon from '@mui/icons-material/Bed';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
 import BuildIcon from '@mui/icons-material/Build';
