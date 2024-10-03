@@ -10,7 +10,50 @@ from .serializers import RoomStatusCreateSerializer, RoomStatusSerializer, Emplo
 from .aimodels import predict_single_image, detect_objects_and_count
 from .models import RoomStatus, RoomCleanLog
 from authentication.models import User
+from .models import RoomStatus, RoomCleanLog
+from .serializers import RoomStatusSerializer, RoomCleanLogSerializer
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def submit_cleaning_report(request):
+    room_number = request.data.get('room_number')
+    notes = request.data.get('notes')
+    reported_issues = request.data.get('reported_issues')
+
+    try:
+        room_status = RoomStatus.objects.get(room_number=room_number)
+    except RoomStatus.DoesNotExist:
+        return Response({'error': 'Room not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    room_status.notes = notes
+    room_status.reported_issues = reported_issues
+    room_status.save()
+
+    clean_log = RoomCleanLog.objects.create(
+        employee=request.user,
+        room=room_status,
+        notes=notes,
+        reported_issues=reported_issues,
+        success=room_status.last_cleaning_success
+    )
+
+    return Response({
+        'message': 'Cleaning report submitted successfully',
+        'cleaning_success': room_status.last_cleaning_success
+    }, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def room_cleaning_history(request, room_number):
+    try:
+        room = RoomStatus.objects.get(room_number=room_number)
+    except RoomStatus.DoesNotExist:
+        return Response({'error': 'Room not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    cleaning_logs = RoomCleanLog.objects.filter(room=room).order_by('-clean_date')
+    serializer = RoomCleanLogSerializer(cleaning_logs, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 class RoomStatusViewSet(viewsets.ModelViewSet):
     queryset = RoomStatus.objects.all()
