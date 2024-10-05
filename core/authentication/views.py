@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.contrib.auth import authenticate, get_user_model
 from knox.models import AuthToken
 from .serializers import SignupSerializer, UserSerializer
+from rest_framework import generics
 
 User = get_user_model()
 
@@ -54,7 +55,8 @@ def update_user_profile(request):
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class UserList(generics.ListAPIView):
+class StaffListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAuthenticated]
+

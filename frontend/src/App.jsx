@@ -12,6 +12,7 @@ import AdminStaffInfo from './components/AdminStaffInfo.jsx';
 import AdminReport from './components/AdminReport.jsx';
 import Profile from './components/Profile.jsx';
 import AddRoom from './components/AddRoom'
+import Rooms from './components/Rooms';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route path='/AdminStaffInfo' element={<AdminStaffInfo />} />
             <Route path='/AdminReport' element={<AdminReport />} />
             <Route path='/Profile' element={<Profile />} />
+            <Route path='/Rooms' element={<Rooms />} />
           </Routes>
         </Router>
       </AuthProvider>

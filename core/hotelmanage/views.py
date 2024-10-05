@@ -12,6 +12,9 @@ from .models import RoomStatus, RoomCleanLog
 from authentication.models import User
 from .models import RoomStatus, RoomCleanLog
 from .serializers import RoomStatusSerializer, RoomCleanLogSerializer
+from .aimodels import predict_single_image, detect_objects_and_count
+from rest_framework import status
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -61,33 +64,52 @@ class RoomStatusViewSet(viewsets.ModelViewSet):
     serializer_class = RoomStatusSerializer
     permission_classes = [IsAuthenticated]
 
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def createroom(request):
     serializer = RoomStatusCreateSerializer(data=request.data)
     if serializer.is_valid():
         room_number = request.data.get('room_number')
+        employee_id = request.data.get('employee')  # Get the employee ID from the request
+
         room_image = serializer.validated_data.get('room_image')
         image_content = ContentFile(room_image.read())
         image_name = room_image.name
         image_path = default_storage.save(f'D:/Hackathon/LOC/core/room_images/{image_name}', image_content)
 
-        # Check if a RoomStatus object with the given room number exists
         if RoomStatus.objects.filter(room_number=room_number).exists():
             return Response({'error': 'Room status already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Logic for creating a new RoomStatus object
-        image, prediction = predict_single_image(image_path)
-        status = 'clean' if prediction[0][0] < 0.6 else 'maintenance'
-        room_status = RoomStatus.objects.create(
-            room_number=room_number,
-            room_image=image_path,
-            status=status
-        )
-        return Response(RoomStatusSerializer(room_status).data, status=status.HTTP_201_CREATED)
-    else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        room_status_value = None
+
+        try:
+            image, prediction = predict_single_image(image_path)
+            if prediction and len(prediction) > 0 and len(prediction[0]) > 0:
+                room_status_value = 'clean' if prediction[0][0] < 0.6 else 'maintenance'
+            else:
+                return Response({'error': 'Prediction data is invalid'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': f'Error during prediction: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        if room_status_value is None:
+            return Response({'error': 'Status could not be determined'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Find the employee instance from the employee_id
+            employee = User.objects.get(id=employee_id)  # Assuming User is the employee model
+
+            room_status = RoomStatus.objects.create(
+                room_number=room_number,
+                employee=employee,  # Set the employee field here
+                room_image=image_path,
+                status=room_status_value
+            )
+            return Response(RoomStatusSerializer(room_status).data, status=status.HTTP_201_CREATED)
+        except User.DoesNotExist:
+            return Response({'error': 'Employee does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
