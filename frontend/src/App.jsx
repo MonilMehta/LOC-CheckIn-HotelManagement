@@ -9,10 +9,10 @@ import AdminDashboard from './components/AdminDashboard.jsx';
 import StaffDashboard from './components/StaffDashboard.jsx';
 import StaffMain from './components/StaffMain.jsx';
 import AdminStaffInfo from './components/AdminStaffInfo.jsx';
-import AdminReport from './components/AdminReport.jsx';
 import Profile from './components/Profile.jsx';
 import AddRoom from './components/AddRoom'
 import Rooms from './components/Rooms';
+import DashboardStats from './components/DashboardStats';
 
 function App() {
   return (
@@ -28,9 +28,11 @@ function App() {
             <Route path='/SignIn' element={<SignIn />} />
             <Route path='/Signup' element={<SignUp />} />
             <Route path='/AdminStaffInfo' element={<AdminStaffInfo />} />
-            <Route path='/AdminReport' element={<AdminReport />} />
             <Route path='/Profile' element={<Profile />} />
             <Route path='/Rooms' element={<Rooms />} />
+            <Route path='/employees' element={<AdminStaffInfo />} />
+            <Route path='/dashboardstats' element={<DashboardStats />} />
+            <Route path='*' element={<Home />} />
           </Routes>
         </Router>
       </AuthProvider>

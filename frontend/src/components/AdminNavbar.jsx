@@ -13,7 +13,8 @@ const ResponsiveAppBarAdmin = () => {
   return (
     <AppBar position="static" sx={{ backgroundColor: '#212121', boxShadow: 3 }}>
       <Toolbar>
-        <Typography variant="h5" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
+        <Typography variant="h5" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}
+        onClick={() => navigate('/AdminDashboard')}>
           Hotel Admin.
         </Typography>
 
@@ -34,7 +35,7 @@ const ResponsiveAppBarAdmin = () => {
           </Button>
           <Button
   color="inherit"
-  onClick={() => navigate('/dashboard')}
+  onClick={() => navigate('/dashboardstats')}
   sx={{ marginRight: 2, fontWeight: 'bold' }}
 >
   Dashboard Stats
@@ -48,10 +49,10 @@ const ResponsiveAppBarAdmin = () => {
 </Button>
 <Button
   color="inherit"
-  onClick={() => navigate('/room-logs')}
+  onClick={() => navigate('/AdminDashboard')}
   sx={{ marginRight: 2, fontWeight: 'bold' }}
 >
-  Room Status Logs
+  Home
 </Button>
 
           <Button

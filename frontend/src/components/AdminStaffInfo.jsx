@@ -1,55 +1,92 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import {
+  Container, Typography, Grid, Card, CardContent, LinearProgress,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
+} from '@mui/material';
 import ResponsiveAppBarAdmin from './AdminNavbar';
 import Footer from './Footer';
-const AdminStaffInfo = () => {
-  const staffData = [
-    { name: 'John Doe', room: 'Room 101', floor: 1 },
-    { name: 'Jane Smith', room: 'Room 202', floor: 2 },
-    { name: 'Bob Johnson', room: 'Room 303', floor: 3 },
-    { name: 'Alice Brown', room: 'Room 404', floor: 4 },
-    { name: 'Charlie Davis', room: 'Room 505', floor: 5 },
-    { name: 'Eva White', room: 'Room 606', floor: 6 },
-    { name: 'Frank Miller', room: 'Room 707', floor: 7 },
-    { name: 'Grace Wilson', room: 'Room 808', floor: 8 },
-    { name: 'Harry Turner', room: 'Room 909', floor: 9 },
-    { name: 'Isabel Lee', room: 'Room 1010', floor: 10 },
-    { name: 'Jack Robinson', room: 'Room 1111', floor: 11 },
-    { name: 'Kelly Garcia', room: 'Room 1212', floor: 12 },
-    { name: 'Leo Martinez', room: 'Room 1313', floor: 13 },
-    { name: 'Mia Perez', room: 'Room 1414', floor: 14 },
-    { name: 'Noah Taylor', room: 'Room 1515', floor: 15 },
-    // Add more staff data as needed
-  ];
 
-  const [randomStaff, setRandomStaff] = useState([]);
+const EmployeeDetails = () => {
+  const [employeeStats, setEmployeeStats] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Shuffle the staff array to get a random order
-    const shuffledStaff = [...staffData].sort(() => Math.random() - 0.5);
-
-    // Select the first 15 staff members
-    const selectedStaff = shuffledStaff.slice(0, 15);
-
-    setRandomStaff(selectedStaff);
+    fetchEmployeeStats();
   }, []);
+
+  const fetchEmployeeStats = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/api/admin/dashboard-stats/', {
+        headers: { Authorization: `Token ${localStorage.getItem('token')}` }
+      });
+      setEmployeeStats(response.data.employee_stats);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching employee stats:', error);
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <LinearProgress />;
+  }
 
   return (
     <div>
       <ResponsiveAppBarAdmin />
-      <div>
-        <h2>Staff Information</h2>
-        {randomStaff.map((staff, index) => (
-          <div key={index}>
-            <h3>Staff {index + 1}:</h3>
-            <p>
-              Name: {staff.name} | Floor: {staff.floor} | Allotted Room: {staff.room}
-            </p>
-          </div>
-        ))}
-      </div>
-      <Footer/>
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Typography variant="h4" gutterBottom>Employee Performance</Typography>
+        <Grid container spacing={3}>
+          {employeeStats.map((employee, index) => (
+            <Grid item xs={12} md={6} key={index}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6">{employee.employee}</Typography>
+                  <Typography variant="body1">
+                    Rooms Cleaned: {employee.cleaned_rooms}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Cleaning Accuracy: {employee.accuracy.toFixed(2)}%
+                  </Typography>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={employee.accuracy} 
+                    sx={{ mt: 1, mb: 1 }}
+                  />
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>Detailed Performance Table</Typography>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Employee Name</TableCell>
+                <TableCell align="right">Rooms Cleaned</TableCell>
+                <TableCell align="right">Cleaning Accuracy</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {employeeStats.map((employee, index) => (
+                <TableRow key={index}>
+                  <TableCell component="th" scope="row">
+                    {employee.employee}
+                  </TableCell>
+                  <TableCell align="right">{employee.cleaned_rooms}</TableCell>
+                  <TableCell align="right">{employee.accuracy.toFixed(2)}%</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Container>
+      <Footer />
     </div>
   );
 };
 
-export default AdminStaffInfo;
+export default EmployeeDetails;
